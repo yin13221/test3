@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <script src="/static/js/jquery-3.2.1.min.js"></script>
+    <link rel="stylesheet" type="text/css" href="/static/css/index.css"/>
+    <title>密码找回</title>
+</head>
+<body>
+    {% include 'nav.html' %}
+
+    <!-- 网站主体 -->
+    <div id="main">
+        <!-- 上传表单-->
+        <div class="upload">
+            <p>密码找回</p>
+            <hr />
+            <form id="find_form" action="/findpass" method="post">
+                <span>
+                    <label>找回方式：</label>
+                    <select class="upt" name="type">
+                        <option selected="selected" value="email">邮件找回</option>
+						<option value="tel">电话找回</option>
+                    </select>
+                </span>
+				<span>
+                    <label>输入注册的手机号：</label>
+                    <input class="upt" type="text" name="tel" value="" />
+                    {% if tel %}
+                        <b>{{ tel }}</b>
+                    {% endif %}
+                </span>
+
+                <span>
+                    <label>输入邮件/电话：</label>
+                    <input class="upt" type="text" name="certificate" value="" />
+                    {% if email %}
+                        <b>{{ email }}</b>
+                    {% endif %}
+                </span>
+				<!--
+					<span>
+						<label>新密码：</label>
+						<input class="upt" type="password" name="" value="" />
+						<b>密码长度为6-20位</b>
+					</span>
+					<span>
+						<label>确认密码：</label>
+						<input class="upt" type="password" name="" value="" />
+						<b>两次输入的密码必须保持一致</b>
+					</span>
+				-->
+                <span><label class="btn"><input type="button" id="find_btn" value="确认找回" /></label></span>
+            </form>
+        </div>
+
+    </div>
+    <script>
+        $(function () {
+            $("#find_btn").click(function () {
+                $.ajax({
+                    url:'/findpass',
+                    method:'POST',
+                    data:$("#find_form").serialize(),
+                    dataType:'json',
+                    success:function (data) {
+                        window.alert(data.msg)
+                    }
+                });
+                {#$(this).parents("form").submit()#}
+            })
+        })
+    </script>
+
+</body>
+
+</html>

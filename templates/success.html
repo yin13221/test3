@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" type="text/css" href="/static/css/index.css"/>
+	<script src="/static/js/jquery-3.2.1.min.js"></script>
+    <title>用户注册</title>
+
+</head>
+<body>
+    {% include 'nav.html' %}
+
+    <!-- 网站主体 -->
+    <div id="main">
+        <!-- 上传表单-->
+        <div class="upload reg2">
+
+			<!-- 注册步骤导航-->
+			<div class="reg_step">
+				<a class="step1" href="/register">注册信息</a><a class="step1" href="/next/1">基本信息</a><a class="step" href="/success">注册完成</a>
+			</div>
+            <hr />
+
+			<p style="text-align:center">
+				<b>欢迎{{nickname}}注册成功、您是本系统第{{userID}}位用户~</b><br/>
+				<a href="/">系统<b id="time">5</b>s后会自动跳转到首页，如不能自动跳转，请点击跳转到首页</a>
+			</p>
+        </div>
+
+    </div>
+    <script>
+        var time = 5;
+        var inter = setInterval(function () {
+            time--;
+            if (time==0){
+                window.location.href='/';
+            }
+            $("#time").text(time)
+        },1000)
+        if(time<=0){
+            clearInterval(inter)
+        }
+    </script>
+
+</body>
+
+</html>

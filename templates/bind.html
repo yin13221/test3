@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" type="text/css" href="/static/css/index.css"/>
+	<script src="/static/js/jquery-3.2.1.min.js"></script>
+    <title>用户绑定</title>
+
+</head>
+<body>
+    {% include 'nav.html' %}
+
+    <!-- 网站主体 -->
+    <div id="main">
+        <!-- 上传表单-->
+        <div class="upload reg2">
+            <p>账号绑定 <span>
+                {% if alipay_user_id %}
+                    <a href="/third/register?id={{ alipay_user_id }}&type=1">如果没有账号，请点击注册</a></span></p>
+                {% elif qq_user_id %}
+                    <a href="/third/register?id={{ qq_user_id }}&type=2">如果没有账号，请点击注册</a></span></p>
+                {% else %}
+                    <a href="/third/register?id={{ wx_user_id }}&type=3">如果没有账号，请点击注册</a></span></p>
+                {% endif %}
+
+            <hr />
+            <form action="/third/bind" autocomplete="off" id="myform" method="post">
+                <input type="hidden" name="alipay_user_id" value="{{alipay_user_id}}">
+                <input type="hidden" name="qq_user_id" value="{{qq_user_id}}">
+                <input type="hidden" name="wx_user_id" value="{{wx_user_id}}">
+                <span>
+                    <label>手机号/账号：</label>
+                    <input id="tel" class="upt" type="text" name="tel" value=""/>
+					<b>{% if msg %}
+                        {{ msg }}
+					{% endif %}</b>
+                    <b></b>
+                </span>
+                <span>
+                    <label>密码：</label>
+                    <input id="password" class="upt" type="password" name="password" value="" />
+                    <b></b>
+                    <b>密码长度为6-20位</b>
+                </span>
+                <span>
+                    <label class="btn">
+                        <input id="reg" type="button" form="myform" value="确认绑定" />
+                    </label>
+                </span>
+            </form>
+        </div>
+
+    </div>
+    <script>
+        $("#reg").click(function () {
+            let tel = $("#tel").val().trim();
+            if (tel == ""){
+                $("#tel").next().text("账号不能为空");
+                return;
+            }
+            if (!/^1[345789]\d{9}$/.test(tel)){
+                $("#tel").next().text("账户必须是手机号");
+                return;
+            }
+            $("#tel").next().text("")
+
+            let password = $("#password").val();
+            let len = password.length;
+            if (len<6||len>20){
+                $("#password").next().text("密码长度不正确");
+                return;
+            }
+            $("#password").next().text("");
+            $(this).parents("form").submit()
+        })
+    </script>
+</body>
+
+</html>

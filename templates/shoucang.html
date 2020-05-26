@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" type="text/css" href="/static/css/index.css"/>
+    <title>收藏</title>
+</head>
+<body>
+    {% include 'nav.html' %}
+
+    <div id="main">
+        <!-- 网站主体 -->
+        {% load extra_filters %}
+        {% for res in data.object_list %}
+
+            <div class="pro">
+               <div class="img">
+                   <img src="/static/images/{{ res.ext | ext  }}.svg" />
+               </div>
+                <div class="cs">
+                    <div class="up">
+                        <a href="/res/detail/{{ res.id }}">{{ res.res_name }}</a>
+                    </div>
+                    <div class="down">
+                        上传者：{{ res.nickname }}  上传时间：{{ res.upload_time |date:'Y-m-d H:i:s'}}
+                    </div>
+                </div>
+                <div class="arr">
+                    积分：<span>{{ res.score }}</span>
+                </div>
+            </div>
+
+        {% endfor %}
+
+
+		<div class="panigation">
+			<a href="/shoucang">首页</a>
+            <a>&lt;上一页</a>
+            <a>下一页&gt;</a>
+            <a>尾页</a>
+		</div>
+    </div>
+
+</body>
+
+</html>

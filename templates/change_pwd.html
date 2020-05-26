@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" type="text/css" href="/static/css/index.css"/>
+    <title>密码找回</title>
+</head>
+<body>
+    {% include 'nav.html' %}
+
+    <!-- 网站主体 -->
+    <div id="main">
+        <div class="upload">
+            <p>修改密码</p>
+            <hr />
+            <form action="" method="post">
+				<span>
+					<label>旧密码：</label>
+					<input class="upt" type="password" name="" value="" />
+				</span>
+				<span>
+					<label>新密码：</label>
+					<input class="upt" type="password" name="" value="" />
+					<b>密码长度为6-20位</b>
+				</span>
+				<span>
+					<label>确认密码：</label>
+					<input class="upt" type="password" name="" value="" />
+					<b>两次输入的密码必须保持一致</b>
+				</span>
+
+                <span><label class="btn"><input type="button" value="确认修改" /></label></span>
+            </form>
+        </div>
+
+    </div>
+
+</body>
+
+</html>

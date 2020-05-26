@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" type="text/css" href="/static/css/index.css"/>
+	<script src="/static/js/jquery-3.2.1.min.js"></script>
+    <title>用户注册</title>
+
+</head>
+<body>
+    {% include 'nav.html' %}
+
+	<div class="reg">
+		<span><label class="btn"><input id="reg" type="button" form="myform" value="下一步" /></label></span>
+	</div>
+
+    <!-- 网站主体 -->
+    <div id="main">
+        <!-- 上传表单-->
+        <div class="upload reg2">
+
+			<!-- 注册步骤导航-->
+			<div class="reg_step">
+				<a class="step" href="/register">注册信息</a><a class="step2" href="javascript:void (0)">基本信息</a><a class="step2" href="/success">注册完成</a>
+			</div>
+            <hr />
+
+            <form action="/register" autocomplete="off" id="myform" method="post">
+                <input type="hidden" name="type" value="{{ type }}" />
+                <input type="hidden" name="third_user_id" value="{{ id }}" />
+                <span>
+                    <label>手机号/账号：</label>
+                    <input id="tel" class="upt" type="text" name="tel" value="" onblur="check_tel(this)"/>
+					<b>{{ msg }}</b>
+                    <b></b>
+                </span>
+                <span>
+                    <label>密码：</label>
+                    <input id="password" class="upt" type="password" name="password" value="" />
+                    <b>密码长度为6-20位</b>
+                </span>
+                <span>
+                    <label>确认密码：</label>
+                    <input id="confirmPass" class="upt" type="password" name="abd" value="" />
+                    <b>两次输入的密码必须保持一致</b>
+                </span>
+            </form>
+        </div>
+
+    </div>
+    <script>
+        function check_tel(t){
+            let tel = t.value;
+            $.ajax({
+                url:'/check/'+tel,
+                method:'GET',
+                dataType:'json',
+                success:function (data) {
+                    $(t).next().text(data.msg);
+                    $(t).data("check",data.status)
+                }
+            })
+        }
+        $(function () {
+            $("#reg").on('click',function () {
+                let tel = $('#tel').val();
+                let regex = /^1[345789]\d{9}$/;
+                if(!regex.test(tel)){
+                    $("#tel").next().text("手机号输入有误~");
+                    return  ;
+                }
+                if (!$("#tel").data("check")){
+                    return;
+                }
+                $("#tel").next().text("");
+                 let password = $("#password").val();
+                let len = password.length ;
+                if (len < 6 || len > 20) {
+                    $("#password").next().text("密码长度不正确");
+                    return ;
+                }
+                $("#password").next().text("")
+                // 获取 确认密码
+                let confirmPass = $("#confirmPass").val();
+
+                if (confirmPass != password){
+                    $("#confirmPass").next().text("两次密码输入的不一致");
+                    return
+                }
+                $("#confirmPass").next().text("")
+                //提交表单
+                $("#myform").submit()
+            })
+        })
+    </script>
+</body>
+
+</html>

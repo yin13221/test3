@@ -1,0 +1,277 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" type="text/css" href="/static/css/index.css"/>
+    <title>首页</title>
+	<script src="/static/js/jquery-3.2.1.min.js"></script>
+    <script src="/static/js/common.js"></script>
+
+</head>
+<body>
+    <!-- 登录弹出层 -->
+    <div class="cvs" {% if not msg %} style="display:none" {% endif %} id="cvs2_logon">
+        <div class="newModWin">
+            <div class="title">登录爱下下账号</div>
+            <div class="close" id="cvs2_close" onclick="close_win()">X</div>
+
+            <div class="logWin">
+                <form action="/login" method="post">
+                    <input type="hidden" name="url" value="{{ request.GET.url }}">
+                    <input type="text" class="inp user" name="tel" value="{{ tel }}" autocomplete="off" placeholder="请输入手机号" />
+                    <input type="password" class="inp pass" name="password" autocomplete="off" placeholder="请输入密码" />
+                    <b class="msg">{{ msg |default:'' }}</b>
+                    <a href="/findpass" class="find_pass">忘记密码，立即找回</a>
+                    <input type="submit" class="su_btn" value="登录" />
+                    <a href="register" class="reg">注册</a>
+                    <p class="third">
+                        <a class="zfb" href="/third/zfb"><span>支付宝</span></a>
+                        <a class="wx"><span>微信</span></a>
+                        <a class="qq"><span>QQ</span></a>
+                    </p>
+                </form>
+            </div>
+        </div>
+    </div>
+
+	{% include 'nav.html' %}
+
+    <!-- 网站头信息-->
+    <div id="nav">
+        <div id="search">
+            <input type="text" name="name" autocomplete="off"/><a class="search btn" >搜索</a>
+        </div>
+
+        <div id="logon">
+            <div class="cons">
+                欢迎光临爱下下！
+            </div>
+            <div class="opers">
+				<a class="btn" href="/upload">上传资料</a>
+            </div>
+        </div>
+
+        <div id="login">
+            {% if request.session.LOGIN_LOCAL_FLAG %}
+                <img src="/photo" alt="">
+            {% else %}
+                <a href="javascript:void(0)" onclick="showWin()">点击登录</a>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- 网站主体 -->
+    <div id="main">
+        <!-- 定义一个条目-->
+        {% load extra_filters %}
+        {% for res in data.object_list %}
+
+            <div class="pro">
+               <div class="img">
+                   <img src="/static/images/{{ res.ext | ext  }}.svg" />
+               </div>
+                <div class="cs">
+                    <div class="up">
+                        <a href="/res/detail/{{ res.id }}">{{ res.res_name }}</a>
+                    </div>
+                    <div class="down">
+                        上传者：{{ res.nickname }}  上传时间：{{ res.upload_time |date:'Y-m-d H:i:s'}}
+                    </div>
+                </div>
+                <div class="arr">
+                    积分：<span>{{ res.score }}</span>
+                </div>
+            </div>
+
+        {% endfor %}
+
+
+		<div class="panigation">
+            <a href="/">首页</a>
+            {% if data.has_previous %}
+                <a href="/?page={{ data.previous_page_number }}">&lt;上一页</a>
+            {% else %}
+                <a href="javascript:void(0);">&lt;上一页</a>
+            {% endif %}
+
+            {% if data.has_next %}
+                <a href="/?page={{ data.next_page_number }}">下一页&gt;</a>
+            {% else %}
+                <a href="javascript:void(0);">下一页&gt;</a>
+            {% endif %}
+
+            <a href="/?page={{ data.paginator.num_pages }}">尾页</a>
+
+            <input type="text" size="5" value="{{ data.number }}">
+		</div>
+    </div>
+
+    <!-- 聊天按钮 -->
+    <aside id="chat">
+        <icon></icon>
+        <a href="javascript:void(0);">在线聊天</a>
+    </aside>
+
+    <!-- 聊天窗口-->
+    <aside id="chat_win">
+        <div class="title">在线聊天，按ESC关闭窗口，按Enter提交信息</div>
+        <!-- 好友面板 -->
+        <div class="frily">
+            <!-- 一个好友 -->
+            <a href="javascript:void(0)" class="fly">
+                <div class='d1'>
+                    <img class="chat_img" src='images/coms.jpg' />
+                    <!-- 显示消息数量 -->
+                    <div class="msg">99+</div>
+                </div>
+                <div class='d2'>
+                    <span>藏三僧</span>
+                </div>
+            </a>
+
+            <a href="javascript:void(0)" class="fly">
+                <div class='d1'>
+                    <img class="chat_img" src='images/coms.jpg' />
+                    <!-- 显示消息数量 -->
+                    <div class="msg">64</div>
+                </div>
+                <div class='d2'>
+                    <span>─╀0vЁ灬忽必烈</span>
+                </div>
+            </a>
+
+            <a href="javascript:void(0)" class="fly">
+                <div class='d1'>
+                    <img class="chat_img" src='images/coms.jpg' />
+                    <!-- 显示消息数量,如果没有，则不显示 -->
+                    <div class="msg zero">0</div>
+                </div>
+                <div class='d2'>
+                    <span>─╀0vЁ灬忽必烈</span>
+                </div>
+            </a>
+
+            <!-- 获取更多 -->
+            <a class="more" href="javascript:void(0)">加载更多</a>
+
+        </div>
+        <!-- 聊天面板 -->
+        <div class="chat_cs">
+            <!-- 聊天内容 -->
+            <div class="content">
+                <!-- 获取更多 -->
+                <a class="more" href="javascript:void(0)">加载更多</a>
+
+                <!--  发信息 -->
+                <div class="right">
+                    <div class='d1'>
+                        <img class="chat_img" src='images/coms.jpg' />
+                    </div>
+                    <div class='d2'>
+                        <span>藏三僧</span><time>2019-10-16 08:58:34</time>
+                        <p>
+                            <span>你好,您的资源能够免费发我一份吗，我这边没有积分了，但是现在非常需要这份资源，如果方便的话，还请送我一份，好吗?</span>
+                        </p>
+                    </div>
+                </div>
+
+                <!--  收信息 -->
+                <div class="left">
+                    <div class='d1'>
+                        <img class="chat_img" src='images/user.jpg' />
+                    </div>
+                    <div class='d2'>
+                        <span>─╀0vЁ灬残夜</span><time>2019-10-16 08:58:34</time>
+                        <p>
+                            <span>不好意思啊，资料我自己没有进行存储</span>
+                        </p>
+                    </div>
+                </div>
+                <!--  收信息 -->
+                <div class="left">
+                    <div class='d1'>
+                        <img class="chat_img" src='images/user.jpg' />
+                    </div>
+                    <div class='d2'>
+                        <span>─╀0vЁ灬残夜</span><time>2019-10-16 08:58:34</time>
+                        <p>
+                            <span>不好意思啊，资料我自己没有进行存储</span>
+                        </p>
+                    </div>
+                </div>
+                <!--  收信息 -->
+                <div class="left">
+                    <div class='d1'>
+                        <img class="chat_img" src='images/user.jpg' />
+                    </div>
+                    <div class='d2'>
+                        <span>─╀0vЁ灬残夜</span><time>2019-10-16 08:58:34</time>
+                        <p>
+                            <span>不好意思啊，资料我自己没有进行存储</span>
+                        </p>
+                    </div>
+                </div>
+
+            </div>
+            <!-- 回复 -->
+            <div class="reply">
+                <textarea id="editer"></textarea>
+            </div>
+
+        </div>
+    </aside>
+
+
+    <script>
+        function showWin(){
+           $("#cvs2_logon").show()
+        }
+
+        function close_win(){
+           $("#cvs2_logon").hide()
+        }
+
+        $(function(){
+            /*
+            UE.getEditor("editer", {
+                toolbars: [[
+                    'bold','|', 'italic'
+                ]],
+                wordCount:false,
+                initialFrameHeight:90,
+                scaleEnabled:true,
+                enableAutoSave:false
+            }); */
+
+            $("#chat").on('click', function(){
+                var tag = $(this);
+                tag.hide();
+                $('#chat_win').show()
+                if(!tag.data('scroll')) {
+                    $(".content , .frily").mCustomScrollbar({
+                        theme:"dark-thin",
+                        callbacks: {
+                            onScroll: function(){
+                                console.log(1)
+                            }
+                        }
+                    });
+                    // 初始化滚动条放到尾部
+                    $(".content").mCustomScrollbar('scrollTo', 'bottom');
+                    tag.data('scroll', true);
+                }
+            })
+
+            $(document).on('keydown', function(e){
+                if (e.keyCode==27){
+                    $('#chat_win').hide()
+                    $("#chat").show()
+                }
+            })
+        })
+
+    </script>
+
+</body>
+
+</html>

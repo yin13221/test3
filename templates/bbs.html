@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" type="text/css" href="/static/css/index.css"/>
+	<script type="text/javascript" charset="utf-8" src="/static/js/jquery-3.2.1.min.js"></script>
+	<script type="text/javascript" charset="utf-8" src="/static/js/ueditor.config.js"></script>
+    <script type="text/javascript" charset="utf-8" src="/static/js/ueditor.all.js"> </script>
+
+    <title>论坛</title>
+</head>
+<body>
+    {% include 'nav.html' %}
+
+    <!-- 网站主体 -->
+    <div id="main">
+        <div class="bbs">
+			<a class="btn" href="#tiezi">发帖</a>
+			<hr />
+            {% for tz in data %}
+                <div class="tz {% if tz.top %}top{% endif %}">
+                    <div class="lf">
+                        <span>{% if tz.top %}[置顶]{% endif %}</span>
+                        <span>[{{tz.bbs_type}}]</span>
+                        <a href="/bbs/detail/{{ tz.pk }}">{{tz.subject}}</a>
+                    </div>
+                    <div class="rf">
+                        <div>
+                            <span>{{tz.user.info.nickname}}</span>
+                            <span>{{tz.create_time}}</span>
+                        </div>
+                        <div>
+                            <span>lisi</span>
+                            <span>2017-05-23 11:56:44</span>
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+
+			<div class="panigation">
+                <a href="/">首页</a>
+                {% if data.has_previous %}
+                    <a href="/?page={{ data.previous_page_number }}">&lt;上一页</a>
+                {% else %}
+                    <a href="javascript:void(0);">&lt;上一页</a>
+                {% endif %}
+
+                {% if data.has_next %}
+                    <a href="/?page={{ data.next_page_number }}">下一页&gt;</a>
+                {% else %}
+                    <a href="javascript:void(0);">下一页&gt;</a>
+                {% endif %}
+
+                <a href="/?page={{ data.paginator.num_pages }}">尾页</a>
+
+                <input type="text" size="5" value="{{ data.number }}">
+		    </div>
+
+
+
+			<a class="btn" href="#tiezi">发帖</a>
+			<hr />
+
+			<!-- 开始发帖-->
+			<!-- 上传表单-->
+			<div class="bbs_tz" id="tiezi">
+				<p>快速发帖</p>
+				<hr />
+				<form action="" method="post" id="myform">
+					<span>
+						<select name="bbs_type">
+							<option>技术专题</option>
+							<option>闲聊专题</option>
+						</select>
+						<input type="text" class="upt" name="subject" placeholder="请输入帖子标题"/>
+					</span>
+					<span>
+						<textarea id="editer" name="content" style="width:625px;height:205px;"></textarea> <!-- class="area"-->
+					</span>
+					<span><a class="btn">发表帖子</a></span>
+				</form>
+			</div>
+		</div>
+    </div>
+
+	<script>
+		$(function(){
+			var ue = UE.getEditor("editer");
+			$("#tiezi a.btn").click(function () {
+                let subject = $("[name=subject]").val();
+                if (subject==null||subject==""){
+                    return ;
+                }
+                let content = ue.getContent();
+                if (content==null||content==""){
+                    return ;
+                }
+                $.ajax({
+                    url:"/bbs/tz",
+                    method:"POST",
+                    data:$("#myform").serialize(),
+                    dataType:"json",
+                    success:function (data) {
+                        var tz_html = `
+                            <div class="tz">
+                                <div class="lf">
+                                    <span></span>
+                                    <span></span>
+                                    <a href="bbsdetail.html"></a>
+                                </div>
+                                <div class="rf">
+                                    <div>
+                                        <span></span>
+                                        <span></span>
+                                    </div>
+                                    <div>
+                                        <span></span>
+                                        <span></span>
+                                    </div>
+                                </div>
+                            </div>
+                        `;
+                        tz_jq = $(tz_html);
+                        if (data.top==1){
+                            tz_jq.find(".lf span:first").text("[置顶]")
+                        }
+                        tz_jq.find(".lf span:eq(1)").text("["+ data.bbs_type +"]");
+                        tz_jq.find(".lf a").attr("href", "/bbs/detail/"+data.id).text(data.subject);
+
+                        tz_jq.find(".rf div:first span:first").text(data.nickname);
+                        tz_jq.find(".rf div:first span:last").text(data.create_time)
+
+                        let tx = $(".bbs .top:last");
+                        if(tx.length==0){
+                            tx = $(".bbs > hr:first")
+                        }
+                        tx.after(tz_jq)
+                    }
+                })
+            })
+		})
+	</script>
+
+</body>
+
+</html>

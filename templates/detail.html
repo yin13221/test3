@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" type="text/css" href="/static/css/index.css"/>
+    <link rel="stylesheet" type="text/css" href="/static/css/jquery.mCustomScrollbar.css"/>
+    <script src="/static/js/jquery-3.2.1.min.js"></script>
+    <script src="/static/js/jquery.mCustomScrollbar.js"></script>
+    <script src="/static/js/common.js"></script>
+    <title>详情</title>
+
+
+</head>
+<body>
+
+{% include 'nav.html' %}
+
+<!-- 网站主体 -->
+<div id="main">
+    {% load extra_filters %}
+    <!-- 定义详细目录-->
+    <div id="detail">
+        <!-- 资源上传者信息 -->
+        <div class="res_author">
+            <img src="/user/photo/{{ resource.user_id }}"/>
+            <span>{{ resource.nickname }}</span><br/>
+            <a class="gz" href="javascript:void(0)">关注</a>
+            <a href="javascript:void(0)">查看TA的更多资源</a>
+        </div>
+        <div class="res_det">
+            <!-- 资源信息 -->
+            <div class="title"> <!-- 主信息-->
+                <div class="img">
+                    <img src="/static/images/{{ resource.ext | ext }}.svg"/>
+                </div>
+                <div class="cons">
+                    <div>
+                        <label>{{ resource.res_name }}</label>
+                    </div>
+                    <div>
+                        <label>{{ resource.upload_time|date:'Y-m-d H-i-s' }}
+                            上传大小：{{ resource.size|filesizeformat }}</label>
+                        {% for res in resource.keyword.split %}
+                            <span>{{ res }}</span>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+            <div class="desc"> <!-- 信息描述-->
+                {{ resource.res_desc }}
+            </div>
+            <div class="msg"> <!-- 评价信息-->
+                {% for i in 0|rjust:5 %}
+
+                    {% if forloop.counter <= star %}
+                        <span class="act">★</span>
+                    {% else %}
+                        <span>★</span>
+                    {% endif %}
+
+                {% endfor %}
+            </div>
+            <div class="oper"> <!-- 下载操作-->
+                <span>所需积分：<b>{{ resource.score }}</b></span>
+                <span>下载次数：<b>{{ resource.download_num }}</b></span><br>
+                <span>
+						<a class="btn" href="/res/download/{{ resource.id }}">普通下载</a>
+                        <a class="btn" id="xunlei">迅雷下载</a>
+						<a class="btn">收藏</a>
+					</span>
+            </div>
+        </div>
+
+    </div>
+    <div id="comment">
+        <div class="title">
+            评论：<span>共有<b>{{ comments|length }}</b>条</span>
+            <hr/>
+        </div>
+
+        {% for com in comments %}
+        <div class="cons">
+            <div class="img">
+                <img src="/user/photo/{{ com.user_id }}"/>
+            </div>
+            <div class="cmt">
+                <div>
+                    <span class="author">{{com.nickname}}</span>
+                    <span class="timer">{{com.comment_time|date:"Y-m-d H-i-s"}}</span>
+                    <span class="star">
+                        {% for i in 0|rjust:5 %}
+                            {% if forloop.counter <= com.star %}
+                                <span class="act">★</span>
+                            {% else %}
+                                <span>★</span>
+                            {% endif %}
+                        {% endfor %}
+                    </span>
+                </div>
+
+                <div class="msg">
+                    <dt>{{com.content}}</dt>
+                </div>
+            </div>
+        </div>
+        {% empty %}
+            <div class="cons">
+                暂无评论
+            </div>
+        {% endfor %}
+    </div>
+
+    <!-- 开始评论-->
+    <div id="mycomments">
+        <div>
+            <span>我的评论</span>
+            <hr/>
+{#            {% csrf_token %}#}
+            <textarea placeholder="可以留下您的宝贵意见哟"></textarea>
+            <div class="star"> <!-- 评价信息-->
+                <span n="1" class="act">★</span>
+                <span n="2">★</span>
+                <span n="3">★</span>
+                <span n="4">★</span>
+                <span n="5">★</span>
+            </div>
+            <a id="commentBtn" class="btn">评论</a>
+        </div>
+
+
+    </div>
+</div>
+<script src="//open.thunderurl.com/thunder-link.js"></script>
+<script src="/static/js/base64.js"></script>
+<script>
+    {% if request.session.download_msg %}
+        alert("{{ request.session.download_msg }}");
+    {% endif %}
+    $(function () {
+        var star = 1;  //默认是 1星
+
+        // 设置 星级 单击选中效果
+        $("#mycomments .star > span").on('click', function () {
+            $(this).addClass("act").prevAll().addClass("act");
+            $(this).nextAll().removeClass("act");
+            star = $(this).attr("n");
+        });
+
+
+        // 当点击评论的时候，提交评论
+        $("#commentBtn").click(function () {
+            // 获取 评论的内容
+            var content = $(this).prevAll("textarea").val();
+
+            // 判断评论的内容不能少于 5个字
+            if (content.length < 5) {
+                alert("评论的内容不能少于5个字符");
+                return;
+            }
+            var token = $("[name=csrfmiddlewaretoken]").val();
+            // 发送异步请求、进行评论
+            $.ajax({
+                url: '/res/comment/{{ resource.id }}',
+                method: 'POST',
+                data: {"star": star, "content": content},
+                dataType: 'json',
+                success: function (data) {
+                    var coment_html = `
+                          <div class="cons">
+                                <div class="img">
+                                    <img src=""/>
+                                </div>
+                                <div class="cmt">
+                                    <div>
+                                        <span class="author">zhangsan</span>
+                                        <span class="timer">2016-05-17 15:32:12</span>
+                                        <span class="star">
+                                            <span>★</span>
+                                            <span>★</span>
+                                            <span>★</span>
+                                            <span>★</span>
+                                            <span>★</span>
+                                         </span>
+                                    </div>
+                                    <div class="msg">
+                                        <dt></dt>
+                                    </div>
+                                </div>
+                            </div>
+                        `;
+                    // 把 html格式的字符串，转成 JQuery对象，通过JQuery来操作DOM
+                    var commnet_jq = $(coment_html);
+
+                    commnet_jq.find("img").attr("src", "/user/photo/" + data.user_id);
+                    commnet_jq.find(".author").text(data.nickname);
+                    commnet_jq.find(".timer").text(data.comment_time.replace("T", " "));
+                    commnet_jq.find(".star span:lt(" + data.star + ")").addClass("act");
+                    commnet_jq.find(".msg dt").text(data.content);
+
+                    // jQuery 文档操作、将一段字符串写入到 网页中
+                    $("#comment .title").after(commnet_jq);
+
+                    var comment_num = $("#comment .title").find("b").text();
+                    comment_num = comment_num - -1;
+                    $("#comment .title").find("b").text(comment_num);
+
+                }
+            })
+        });
+
+
+        $("#xunlei").on("click", function (e) {
+            if ('{{ request.session.LOGIN_LOCAL_FLAG }}' != '') {
+                // 获取资源下载的地址 http://127.0.0.1:8000
+                var prefix = window.location.origin
+                var url = "AA" + prefix + "/res/download/" + {{resource.id}} +"ZZ"
+                // 通过 Base64 编码，形成迅雷需要的地址
+                var base64 = new Base64()
+                //对 地址进行 编码
+                var thunder = "thunder://" + base64.encode(url)
+
+                // 调用迅雷，进行下载
+                thunderLink.newTask({
+                    downloadDir: '', // 指定当前任务的下载目录，迅雷会在用户剩余空间最大的磁盘根目录中创建这个目录。若不填此项，会下载到用户默认下载目录
+                    tasks: [{
+                        name: '{{ resource.res_name }}.{{ resource.ext }}', // 指定下载文件名（含扩展名）。若不填此项，将根据下载 URL 自动获取文件名
+                        url: thunder, // 指定下载地址
+                        header: {
+                            "DOWNLOAD_HEADER": "xunlei"
+                        }
+                    }]
+                });
+            } else {
+                //提示用户登录
+                window.location.href = "/res/download/{{ resource.id }}"
+            }
+        })
+    })
+
+</script>
+</body>
+</html>

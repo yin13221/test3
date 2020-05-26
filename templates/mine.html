@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" type="text/css" href="/static/css/index.css"/>
+	<script src="/static/js/jquery-3.2.1.min.js"></script>
+    <title>个人信息</title>
+</head>
+<body>
+    {% include 'nav.html' %}
+    {% load extra_filters %}
+    <!-- 网站主体 -->
+    <div id="main">
+        <div class="personal">
+			<div class="lf">
+				<img src="/photo"alt="用户头像"/>
+			</div>
+
+			<div class="rf">
+				<div>
+					<span>{{nickname}}</span>
+					<span>
+						<b>{{realname}}</b> | <b>{{sex|sex}}</b> |  <b>{{ birth |date:'Y-m-d' }}</b>
+						<b><a href="/change_pwd">修改密码</a></b>
+					</span>
+				</div>
+
+				<div>
+					<span><b>{{score |default:0}}</b>积分</span>
+					<span><b>0</b>关注</span>
+				</div>
+			</div>
+		</div>
+
+    </div>
+
+</body>
+
+</html>
